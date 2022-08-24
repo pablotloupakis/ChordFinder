@@ -1,0 +1,338 @@
+ /* Add a black background color to the top navigation */
+.topnav {
+    background-color: #333;
+    overflow: hidden;
+	position: fixed; 
+	width: 100%;
+	top: 0;
+	z-index:4;
+}
+/* Style the links inside the navigation bar */
+.topnav a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+	padding-top: 1%; 
+	padding-bottom: 1%; 
+	padding-left: 1%; 
+	padding-right: 1%; 
+    text-decoration: none;
+    font-size: 90%;
+	font-weight: bold;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+/* Add an active class to highlight the current page */
+.activeTAB {
+    background-color: #4CAF50;
+    color: white;
+}
+
+#MailTo{
+	font-size: 100%;
+}
+
+#burgerMenu{
+	font-size: 100%;
+	font-weight: bold;
+	float: right;
+}
+/* Hide the link that should open and close the topnav on small screens */
+.topnav .icon {
+    display: none;
+}
+/* When the screen is less than 600 pixels wide, hide all links,  */
+/* Show the link that contains should open and close the topnav (.icon) */
+@media screen and (max-width: 600px) {
+  .topnav a {display: none;}
+  .topnav a.icon {
+    float: right;
+    display: block;
+  }
+  
+}
+/* The "responsive" class is added to the topnav with JavaScript when the user clicks on the icon. */
+/* This class makes the topnav look good on small screens (display the links vertically instead of horizontally) */
+@media screen and (max-width: 600px) {
+  .topnav.responsive {position: relative;}
+  .topnav.responsive a.icon {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  .topnav.responsive a {
+    float: none;
+    display: block;
+    text-align: left;
+  }
+  .CONTAINERLevel1.responsive {
+	margin-top: 8%;
+  }
+}
+
+.CONTAINERLevel1{
+	margin-top: 3.3%; 
+}
+
+
+html {
+   font-family: Verdana;
+   padding: 0px; margin: 0px; border: 0px solid #000000;
+   text-align:left;
+}
+
+select{
+	font-size: 80%;
+	/* border-radius: 10px ;*/
+	border: 0.5px solid grey;
+	/* box-shadow: 2px 2px #4CAF50;*/
+}
+
+
+
+/* 1. Chord Finder */
+#CONTAINERChordFinder{
+	
+}
+#divChordWrapper1{
+	width: 100%;
+	
+}
+#txtbarra,  #txtBassNoteInString{
+	display: inline; 
+	font-size: 80%;
+}
+	
+#divChordWrapper2{
+	background-color: #4CAF50;
+	width: 100%;
+}
+#divChordWrapper3{
+	overflow: auto; 
+	width: 100%;
+	border-style: solid;
+	border-width: thin; 
+	border-color: red;
+}
+#TableChordFinder{
+    font-size: 80%;
+	border-collapse: collapse;
+	background-color: #4CAF50;
+	/* font-weight: bold;*/
+	color: white;
+    /* display: none; */
+}
+
+
+/* 2. Reverse Chord Finder */
+#divReverseWrapper1{
+	border-style: solid;
+	border-width: thin; 
+	/* margin: auto; */
+	margin-top: 1%; 
+	margin-bottom: 1%; 
+	padding-top: 1%; 
+	padding-bottom: 1%;
+	overflow-y:scroll;	
+	height: 250px; 
+	width: 200px; 
+
+}
+#divReverseWrapper2{
+	border-style: solid; 
+	border-width: thin; 
+	display: block;
+}
+#divReverseWrapper3{
+	/*border-style: solid; */
+	/*border-width: thin; */
+	display: none; 
+	padding-top: 1%; 
+	padding-bottom: 1%;
+	background-color: #4CAF50; 	
+}
+
+#ReverseGetChordButton{
+	background-color: #4CAF50;
+	border-radius: 4px;
+	margin-top: 1%; 
+	margin-bottom: 1%;
+	margin-left: 2%; 
+	padding-top: 0.5%; 
+	padding-bottom: 0.5%;	
+	padding-left: 1%;	
+	padding-right: 1%;	
+    font-size: 90%;
+	font-weight: bold;
+	color: white;
+	text-decoration: none;
+	box-shadow: none;
+	border: none;
+}
+#ReversePlayChordButton{
+	background-color: #4CAF50;
+	border-radius: 4px;
+	margin-top: 1%; 
+	margin-bottom: 1%;
+	margin-left: 1%;
+	padding-top: 0.5%; 
+	padding-bottom: 0.5%;	
+	padding-left: 1%;	
+	padding-right: 1%;	
+    font-size: 90%;
+	font-weight: bold;
+	color: white;
+	text-decoration: none;
+	box-shadow: none;
+	border: none;
+}
+#ReverseResetButton{
+	background-color: #4CAF50;
+	border-radius: 4px;
+	margin-top: 1%; 
+	margin-bottom: 1%;
+	margin-left: 1%;
+	padding-top: 0.5%; 
+	padding-bottom: 0.5%;	
+	padding-left: 2%;	
+	padding-right: 2%;	
+    font-size: 90%;
+	font-weight: bold;
+	color: white;
+	text-decoration: none;
+	box-shadow: none;
+	border: none;
+}
+.contentcell{
+	font-weight: bold;
+	font-size: 100%;
+}
+#TableReverseChordFinder{
+	font-size: 80%;
+	border-collapse: collapse;
+	background-color: #4CAF50;
+	/* font-weight: bold;*/
+	color: white;
+    /* display: none; */
+}
+.HREFsToChord{
+	font-size: 100%;
+	padding-left: 0%;
+	padding-right: 1%; 
+}
+
+
+.HREFsToChord:link {
+    color: white; 
+}
+.HREFsToChord:visited{
+    color: white; 
+}
+.HREFsToChord:hover {
+    color: yellow;
+}
+
+/* 3. Progression Generator */
+#divProgressionWrapper1{
+	border-style: solid; 
+	border-width: thin; 
+	padding-top: 0.5%; 
+	padding-bottom: 0.5%;
+}
+#divProgressionWrapper2{
+	border-style: solid; 
+	border-width: thin; 
+	border-color: red;
+	padding-top: 0.5%; 
+	padding-bottom: 0.5%;
+}
+#divProgressionWrapper3{
+	border-style: solid; 
+	border-width: thin; 
+	padding-top: 0.5%; 
+	padding-bottom: 0.5%;
+}
+
+/* Drawing tabs */
+.divContainerTab{
+	border-style: solid;
+	border-width: thin; 
+	border-color: red;
+	display: inline;
+	float: left; 
+	position: relative;
+}
+svg{
+	display: inline;
+	float: left; 
+	background-color: white;	
+}
+.gridline {
+	stroke:grey; 
+	stroke-width: 0.25; 	
+}
+.stringAndFret{
+	stroke:black;
+	stroke-width: 1
+;	
+}
+.dotNotRoot{
+	fill: black; 
+	stroke:black;
+	stroke-width: 0.75;
+}
+.dotRoot{
+	fill: #4CAF50; 
+	stroke:black;
+	stroke-width: 2;
+}
+.dotRootZero{
+	stroke: #4CAF50; 
+	fill: white; 
+	stroke-width: 2;
+}
+.dotNotRootZero{
+	stroke: black; 
+	fill: white; 
+	stroke-width: 2; 
+}
+.dotReverseEnabled{
+	fill: #4CAF50; 
+	stroke:#4CAF50;
+	stroke-width: 2;
+
+}
+.dotReverseDisabled{
+	fill: white; 
+	opacity: 0.1;
+}
+.fretNumberText{
+	font-weight:bold;	
+	fill:black;
+	text-anchor:start;
+}
+.barre{
+	stroke:black;
+	stroke-linecap:round;	
+}
+.playButton{
+	color:black;
+	opacity: 0.1; 
+	font-size: 3em;
+	position: absolute; 
+	top:10%;
+	left:45%;
+	padding-left: 5%; 
+	padding-right: 5%; 
+}	
+.playButton:hover{
+    background-color: yellow;
+	opacity: 0.5; 
+}
+

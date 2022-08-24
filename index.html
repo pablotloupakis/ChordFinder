@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+ <html lang="en-US">
+	<head>
+		<title> The Chord Thing  </title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">	
+		<meta window.top="The Chord Thing"> 
+		<link rel="stylesheet" type="text/css" href="CSS/reset.css">
+		<link rel="stylesheet" type="text/css" href="CSS/normalize.css">
+		<link rel="stylesheet" type="text/css" href="CSS/DEFAULT.css">
+	</head>
+	<body>
+		<header></header>
+		<footer><!--&copy; Pablo Tloupakis. All rights reserved.-->	</footer>
+		<div id=CONTAINERChordFinder class="CONTAINERLevel1">
+			<div id=divChordWrapper1> 
+				<select  id=selRootNote>
+				  <option value="None">Select Note</option>
+				  <option value="C">C</option>
+				  <option value="C#">C#</option>
+				  <option value="D">D</option>
+				  <option value="D#">D#</option>
+				  <option value="E">E</option>
+				  <option value="F">F</option>
+				  <option value="F#">F#</option>
+				  <option value="G">G</option>
+				  <option value="G#">G#</option>
+				  <option value="A">A</option>
+				  <option value="A#">A#</option>
+				  <option value="B">B</option>
+				</select>
+				<select  id=selChordList>
+					<option value="None">Select Chord</option>
+					<optgroup id="OptGroupMaj" label="Major"></optgroup>
+					<optgroup id="OptGroupMin" label="Minor"></optgroup>			
+					<optgroup id="OptGroupDim" label="Diminished"></optgroup>
+					<optgroup id="OptGroupAug" label="Augmented"></optgroup>
+					<optgroup id="OptGroupDom" label="Dominant"></optgroup>			
+					<optgroup id="OptGroupSus" label="Suspended"></optgroup>
+					<optgroup id="OptGroupDiad" label="Diad"></optgroup>
+					<optgroup id="OptGroupFamous" label="Famous Chords"></optgroup>
+				</select>	
+				<p id="txtbarra"> / </p>
+				<select  id=selBassNote>
+				  <option value="Default">Default</option>
+				  <option value="C">C</option>
+				  <option value="C#">C#</option>
+				  <option value="D">D</option>
+				  <option value="D#">D#</option>
+				  <option value="E">E</option>
+				  <option value="F">F</option>
+				  <option value="F#">F#</option>
+				  <option value="G">G</option>
+				  <option value="G#">G#</option>
+				  <option value="A">A</option>
+				  <option value="A#">A#</option>
+				  <option value="B">B</option> 
+				</select>	
+				<p id="txtBassNoteInString"> Bass note on: </p>
+				<select  id=selBassInString>
+				  <option value="Any">Any string</option>
+				  <option value="6th">6th string</option>
+				  <option value="5th">5th string</option>
+				  <option value="4th">4th string</option>
+				  <option value="3rd">3rd string</option>
+				</select>			
+			</div>
+			<div id=divChordWrapper2> 
+				 <table id=TableChordFinder>
+					  <tr>
+						<td>Chord Name</td>
+						<td> &nbsp; : &nbsp;</td>
+						<td class="contentcell"></td>
+					  </tr>
+					  <tr>
+						<td>Chord Formula  &nbsp;  &nbsp;</td>
+						<td> &nbsp; : &nbsp;</td>
+						<td class="contentcell"></td>
+					  </tr>
+					  <tr>
+						<td>Chord Notes</td>
+						<td> &nbsp; : &nbsp;</td>
+						<td class="contentcell"></td>
+					  </tr>
+				</table> 		
+			</div>
+			<div id=divChordWrapper3> 
+			</div>
+		</div>		
+		
+		<script type="text/javascript" src="JS/chords.js" ></script>
+				
+	</body>
+ </html> 
