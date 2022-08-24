@@ -1,0 +1,81 @@
+											if (arr2[i2] ==="" && arr3[i3] ==="" && arr4[i4] ==="") {bolOk = false;} 
+											if (arr2[i2] ==="" && arr3[i3] ==="" && arr4[i4] ==="" && arr5[i5] ==="") {bolOk = false;} 
+											if (arr3[i3] !=="" && arr2[i2] !=="") {bolOk = false;} //2 and 3 not a valid triad
+											if (arr3[i3] !=="" && arr4[i4] !=="") {bolOk = false;} //3 and 4 not a valid triad
+											if (arr2[i2] !=="" && arr4[i4] !=="") {bolOk = false;} //2 and 4 not a valid triad
+											if (arr2[i2] ==="2" && arr5[i5] ==="b5") {bolOk = false;} //2 and b5 not a valid triad
+											if (arr2[i2] ==="2" && arr5[i5] ==="#5") {bolOk = false;} //2 and #5 not a valid triad
+											if (arr2[i2] ==="b2" && arr5[i5] ==="#5") {bolOk = false;} //b2 and #5 not a valid triad
+											if (arr3[i3] ==="b3" && arr5[i5] ==="#5") {bolOk = false;} //b3 and #5 not a valid triad
+											if (arr2[i2] ==="" && arr3[i3] ==="" && arr4[i4] ==="4" && arr5[i5] ==="#5") {bolOk = false;} //b3 and #5 not a valid triad
+											if (arr2[i2] ==="" && arr3[i3] ==="" && arr4[i4] ==="" && arr5[i5] ==="b5") {bolOk = false;} 
+											
+											
+											//5 is optional for 7/9/11/13 chords 
+											if (arr5[i5] === ""){
+												if (arr7[i7] === "b7" || arr7[i7] === "7" || arr7[i7] === "bb7") { } else {bolOk = false;}
+											}
+											//9 is optional por 11/13 chords 
+											if (arr9[i9] === ""){
+												if (arr7[i7] === "b7" || arr7[i7] === "7" || arr7[i7] === "bb7") { } else {bolOk = false;}
+												if (arr11[i11] === "11" ) { } else {bolOk = false;}
+											}
+											
+											//11 is optional por 13 chords 
+											if (arr11[i11] === ""){	
+												if (arr7[i7] === "b7" || arr7[i7] === "7" || arr7[i7] === "bb7") { } else {bolOk = false;}
+												if (arr13[i13] === "13" ) { } else {bolOk = false;}											
+											}
+											
+											
+											
+		//--------------------5th can be ommitted for 7/b7 chords for guitar, http://www.smithfowler.org/music/Chord_Formulas.htm
+		
+		case ("1,3,b7")	:
+			sTriad="Dominant"; 
+			break; 	
+		case ("1,3,7")	: 
+			sTriad="Major"; 
+			break; 			
+		case ("1,b3,7") :
+			sTriad="min/Maj"; 
+			break;	
+		case ("1,b3,b7") :
+			sTriad="minor"; 
+			break;
+		
+		//-------------------5th can be omitted for Maj6 ? ----------------------------------------------------------------------
+		case ("1,3,6")	: 
+			sTriad="Major"; 
+			break; 	
+		//-------------------5th can be omitted for min6 ? ----------------------------------------------------------------------
+		case ("1,b3,6")	: 
+			sTriad="minor"; 
+			break; 			
+		//------------------------------------------------------------------------------------------------------------------------												
+
+
+	if (s7 === "b7" || s7 === "7" || s7 === "bb7") { 
+		iSeven = 7; 
+		if (s13 === "13") {
+			if ((s9 === "9" || s9 === "") && (s11 === "11" || s11 === "")) {iSeven = 13;} //9 and 11 optional in 13th		
+		}
+		if (s11 === "11" && s13 !== "13"){
+			if (s9 === "9" || s9 === "")  {iSeven = 11;} //9 optional in 11th	
+		}
+		if (s9 === "9" && s11 !== "11" && s13 !== "13"){
+			iSeven = 9; 
+		}		
+	}	
+
+
+											
+												//add to database
+												counterChords++;
+												MyApp.DBchords.push({
+													FormulaRaw: arrFormulaRaw, 
+													FormulaStr: arrFormulaStr, 
+													OptionalStr: arrOptionalStr,
+													OptionalNotesRef:arrOptionalNotesRef, 
+													CHORDId:arrFormulaStr.join()
+												});											

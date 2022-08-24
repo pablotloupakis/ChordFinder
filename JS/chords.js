@@ -2,10 +2,12 @@
 console.log ("Hello Chords");
 
 //1. Create listeners ----------------- 
-document.getElementById("selBassInString").addEventListener("change", FilterByRootInString, false);
 document.getElementById("selRootNote").addEventListener("change", ChordFinderMain, false);
 document.getElementById("selChordList").addEventListener("change", ChordFinderMain, false);
 document.getElementById("selBassNote").addEventListener("change", ChordFinderMain, false);
+document.getElementById("selBassInString").addEventListener("change", DrawTabs, false);
+document.getElementById("selTuning").addEventListener("change", DrawTabs, false);
+
 
 //2. Create the chords -----------------
 let chordsDB = BuildChordDB(); 
@@ -47,6 +49,10 @@ function ChordFinderMain(){
 	let elChord = document.getElementById("selChordList"); 
 	let elBass = document.getElementById("selBassNote"); 
 	
+	if  ((elRoot.selectedIndex === 0) || (elChord.selectedIndex === 0)) {
+		return; 
+	}
+	
 	let strRoot = elRoot.options[elRoot.selectedIndex].value; 
 	let strChordName = elChord.options[elChord.selectedIndex].text; 
 	let strBass = elBass.options[elBass.selectedIndex].value; 
@@ -78,8 +84,8 @@ function ChordFinderMain(){
 
 }
 
-function FilterByRootInString (){
-	console.log ("FilterByRootInString"); 
+function DrawTabs (){
+	console.log ("Update the tabs!"); 
 }
 
 //-------Music Theory-----------------------------------------------------
