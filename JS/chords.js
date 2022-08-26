@@ -8,7 +8,6 @@ document.getElementById("selBassNote").addEventListener("change", ChordFinderMai
 document.getElementById("selBassInString").addEventListener("change", DrawTabs, false);
 document.getElementById("selTuning").addEventListener("change", DrawTabs, false);
 
-
 //2. Create the chords -----------------
 let chordsDB = BuildChordDB(); 
 AddDiadsToDB(chordsDB); 
@@ -42,16 +41,14 @@ for (let i=0; i < chordsDB.length; i++){
 	}
 }
 
-//Stuff
+//Main! 
 function ChordFinderMain(){
 	//1. Read inputs --------------------------------------------------------------------------------------------------------------------------------------------------
 	let elRoot = document.getElementById("selRootNote"); 
 	let elChord = document.getElementById("selChordList"); 
 	let elBass = document.getElementById("selBassNote"); 
 	
-	if  ((elRoot.selectedIndex === 0) || (elChord.selectedIndex === 0)) {
-		return; 
-	}
+	if  ((elRoot.selectedIndex === 0) || (elChord.selectedIndex === 0)) {return; }
 	
 	let strRoot = elRoot.options[elRoot.selectedIndex].value; 
 	let strChordName = elChord.options[elChord.selectedIndex].text; 
@@ -59,24 +56,39 @@ function ChordFinderMain(){
 	let strFormulaStr = elChord.options[elChord.selectedIndex].value; 
 	let arrFormulaStr = strFormulaStr.split(',');
 	let arrFormulaInt =  GetChordDegrees(arrFormulaStr); 
+	let iSeven = GetSeven (arrFormulaStr); 
+	let arrOptionalStr = GetOptionalNotes (iSeven); 
+	let arrOptionalInt = GetChordDegrees (arrOptionalStr);
+	
 	
 	console.clear(); 
 	console.log ("%c-----------------------------------------------------------------------------------------------------------------------------------", 'color: cyan'); 
 	console.log ("%cRoot			   	:", "color: cyan", strRoot); 
 	console.log ("%cChord			 	:", "color: cyan", strChordName);  
-	console.log ("%cFormula				:", "color: cyan", strFormulaStr); 
-	console.log ("%cFormula				:", "color: cyan", arrFormulaStr); 	
-	console.log ("%cFormula				:", "color: cyan", arrFormulaInt);
 	console.log ("%cBass Note			:", "color: cyan", strBass); 	
+	console.log ("%cFormula				:", "color: cyan", strFormulaStr); 
+	console.log ("%cFormula	(degrees)		:", "color: cyan", arrFormulaStr); 	
+	console.log ("%cFormula	(integer)		:", "color: cyan", arrFormulaInt);
+	console.log ("%cOptional notes (degrees)	:", "color: cyan", arrOptionalStr);
+	console.log ("%cOptional notes (integer)	:", "color: cyan", arrOptionalInt);
+	console.log ("%cSeven				:", "color: cyan", iSeven); 	
 
 	//2. Apply Notes to the Formula 
 	let arrScale = GetChromaticScale(strRoot); 
 	console.log ("%cCromatic Scale			:", "color: cyan", arrScale); 
+	
 	let arrNotes = []; 
-	for (let i=0; i<arrFormulaInt.length; i++){
+	let arrOptionalNotes = []; 
+
+	for (let i=0; i < arrFormulaInt.length; i++){
 		arrNotes.push (arrScale[arrFormulaInt[i]]); 
 	}
+	for (let i=0; i < arrOptionalInt.length; i++){
+		arrOptionalNotes.push (arrScale[arrOptionalInt[i]]); 
+	}
+	
 	console.log ("%cChord Notes			:", "color: cyan", arrNotes); 	
+	console.log ("%cChord Optional Notes 		:", "color: cyan", arrOptionalNotes); 	
 	
 	//3. Output text 
 	
@@ -84,6 +96,7 @@ function ChordFinderMain(){
 
 }
 
+//------The Dom ----------------------------------------------------------
 function DrawTabs (){
 	console.log ("Update the tabs!"); 
 }
@@ -201,7 +214,6 @@ function BuildChordDB (){
 	console.log (arrOUT.length + "  " + "chords!");  
 	return (arrOUT); 
 }
-
 function BuildChordName (arrIN) {  
 	//INPUT: arrIN with degrees (NOT integers). Example: ["1","b3","5","b7"]; 
 	//OUTPUT: string with chord name; returns "" if not valid triad or < not diad 
@@ -322,7 +334,6 @@ function BuildChordName (arrIN) {
 	sName = sName.trim(); 
 	return (sName); 
 }
-
 function AddDiadsToDB(arrIN) {
 	let arrTemp = ["b2","2","b3","3","4","b5","5", "#5","6","b7","7","b9","9","#9","11","b11","#11","13","b13","#13"]; 	
 	for (let i=0; i<arrTemp.length; i++){
@@ -337,7 +348,6 @@ function AddDiadsToDB(arrIN) {
 	}
 	console.log (arrIN.length + "  " + "chords!");  
 }
-
 function GetTriad (arrIN) {  
 	//INPUT: arrIN with degrees (NOT integers). Example: ["1","b3","5","b7"]; 
 	//OUTPUT: string with triad name; returns "" if not valid triad
@@ -454,7 +464,6 @@ function GetTriad (arrIN) {
 	return (sTriad); 
 	
 }
-
 function GetSeven (arrIN) {  
 	//INPUT: arrIN with degrees (NOT integers). Example: ["1","b3","5","b7"]
 	//OUTPUT: integer with value of Seven: 0, 7, 9, 11, 13
@@ -518,7 +527,6 @@ function GetSeven (arrIN) {
 	}	
 	return (iSeven); 
 }
-
 function GetChordDegrees (arrIN){
 	//convers a chord formula to integers 
 	//INPUT: array with degrees (string) of the formula
@@ -585,4 +593,43 @@ function GetChromaticScale(strNote) {
 		arrScale.push (arrScale.shift());
 	}
 	return arrScale;		
+}
+function GetOptionalNotes (iSeven) {  
+	//--------------------5th can be ommitted for 7/b7 chords for guitar, http://www.smithfowler.org/music/Chord_Formulas.htm
+	//("1,3,b7"), ("1,3,7"), ("1,b3,7"),("1,b3,b7") :
+	//-------------------5th can be omitted for Maj6 and min6? ----------------------------------------------------------------------
+	//("1,3,6"),("1,b3,6")
+	//5 is optional for 7/9/11/13 chords 
+	//9 is optional por 11/13 chords 
+	//11 is optional por 13 chords 
+			
+	//INPUT: <INTEGER>: 0,7,9,11,13
+	//OUTPUT: array of <strings> with optional degrees 
+	
+	let arrOut=[]; 
+	
+	if (arguments.length !==1) {console.log ("ERROR: Invalid number of arguments"); return(arrOut);}
+	if (typeof iSeven === 'number')  {} else {console.log ("ERROR: Invalid type");return(arrOut); }   	
+
+	switch (iSeven) {
+		case 0: return (arrOut); break;	
+		case 7: 
+			arrOut.push ("5"); 
+			break; 
+		case 9: 
+			arrOut.push ("5"); 
+			break; 		
+		case 11: 
+			arrOut.push ("5"); 
+			arrOut.push ("9"); 			
+			break; 		
+		case 13: 
+			arrOut.push ("5"); 
+			arrOut.push ("9"); 			
+			arrOut.push ("11"); 						
+			break; 			
+		default: break; 
+	}
+	return (arrOut);  
+
 }
