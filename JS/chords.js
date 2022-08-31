@@ -90,9 +90,20 @@ function ChordFinderMain(){
 	console.log ("%cChord Notes			:", "color: cyan", arrNotes); 	
 	console.log ("%cChord Optional Notes 		:", "color: cyan", arrOptionalNotes); 	
 	
-	//3. Output text 
+	//3. Get the tabs 
+	let arrTuning = document.getElementById("selTuning").value.split("-"); 
+	let arrTabs = GetTabs (arrNotes, arrOptionalNotes, arrTuning); 
+	console.log ("%cTabs for this chord 		:", "color: cyan", arrTabs.length); 	
 	
-	//4. Output guitar 
+	for (let i=0; i<arrTabs.length; i++){
+		console.log (arrTabs[i]); 
+	}
+	
+	
+	
+	//4. Output text 
+	
+	//5. Output guitar 
 
 }
 
@@ -633,3 +644,312 @@ function GetOptionalNotes (iSeven) {
 	return (arrOut);  
 
 }
+function GetTabs(arrNotes, arrOptionalNotes, arrTuning){
+	//INPUT : 
+	//	arrNotes: array of <string>. Notes of the chord 
+	// 	arrOptionalNotes: array of <string>. Optional notes of the chord 
+	// 	arrTuning: array of <string>. Guitar tuning 
+	//OUTPUT:  array of arrays. Each array being a tab. 
+
+	if (arguments.length !==3) {console.log ("ERROR: Invalid number of arguments"); return;}
+	if (Array.isArray(arrNotes)) {}else{console.log ("ERROR: Invalid type");return; }   	
+	if (Array.isArray(arrOptionalNotes)) {}else{console.log ("ERROR: Invalid type");return; }   	
+	if (Array.isArray(arrTuning)) {}else{console.log ("ERROR: Invalid type");return; }   	
+	
+	let arrOUT = []; 
+	
+	//1.-------------find the MANDATORY notes
+	let arrMandatoryNotes=[]; 
+	for (let i=0; i<arrNotes.length; i++){
+		if (arrOptionalNotes.indexOf(arrNotes[i]) === -1) {
+			arrMandatoryNotes.push (arrNotes[i]); 	
+		}
+	}
+	
+	console.log ("%c-----------------------------------------------------------------------------------------------------------------------------------", 'color: cyan'); 
+	console.log ("%cMandatory Notes		   	:", "color: cyan", arrMandatoryNotes); 	
+	
+	//2.-------------reference, we build the string from here 
+    let arrString = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"];
+	
+	//3.----------------sanitize arrTuning------------------------------------------------
+	for (let i=0; i < arrTuning.length; i++){
+		if (arrTuning[i].indexOf("'") > -1 ){
+			arrTuning[i] = arrTuning[i].replace (/'/g,''); 
+		}
+		if (arrTuning[i].indexOf("b") > -1 ){
+			arrTuning[i] = arrTuning[i].replace (/Ab/g,'G#'); 
+			arrTuning[i] = arrTuning[i].replace (/Bb/g,'A#'); 
+			arrTuning[i] = arrTuning[i].replace (/Cb/g,'B'); 
+			arrTuning[i] = arrTuning[i].replace (/Db/g,'C#'); 
+			arrTuning[i] = arrTuning[i].replace (/Eb/g,'D#'); 
+			arrTuning[i] = arrTuning[i].replace (/Fb/g,'E'); 
+			arrTuning[i] = arrTuning[i].replace (/Gb/g,'F#');
+		}
+	}
+	//4.----------------build the guitar------------------------------------------------
+	let cuerda1 = GetChromaticScale (arrTuning[5]);  
+	let cuerda2 = GetChromaticScale (arrTuning[4]);
+	let cuerda3 = GetChromaticScale (arrTuning[3]);
+	let cuerda4 = GetChromaticScale (arrTuning[2]);
+	let cuerda5 = GetChromaticScale (arrTuning[1]);
+	let cuerda6 = GetChromaticScale (arrTuning[0]);
+	//5.---------------find all chord notes in the strings------------------------------
+	let arrStr6=[];let arrStr5=[]; let arrStr4=[]; let arrStr3=[]; let arrStr2=[]; let arrStr1=[];  
+	arrStr6.push("x");arrStr5.push("x");arrStr4.push("x");arrStr3.push("x");arrStr2.push("x");arrStr1.push("x");
+	arrNotes.forEach (function(chordnote){
+		cuerda6.forEach (function (cuerdaNote,i){if (chordnote === cuerdaNote) {arrStr6.push(i)};});
+		cuerda5.forEach (function (cuerdaNote,i){if (chordnote === cuerdaNote) {arrStr5.push(i)};});
+		cuerda4.forEach (function (cuerdaNote,i){if (chordnote === cuerdaNote) {arrStr4.push(i)};});
+		cuerda3.forEach (function (cuerdaNote,i){if (chordnote === cuerdaNote) {arrStr3.push(i)};});
+		cuerda2.forEach (function (cuerdaNote,i){if (chordnote === cuerdaNote) {arrStr2.push(i)};});
+		cuerda1.forEach (function (cuerdaNote,i){if (chordnote === cuerdaNote) {arrStr1.push(i)};});
+	});	
+	//6.--------------create patterns--------------------------------------------------
+	for (let i6=0; i6 < arrStr6.length; i6++){
+		for (let i5=0; i5 < arrStr5.length; i5++){
+			for (let i4=0; i4 < arrStr4.length; i4++){
+				for (let i3=0; i3 < arrStr3.length; i3++){
+					for (let i2=0; i2 < arrStr2.length; i2++){
+						for (let i1=0; i1 < arrStr1.length; i1++){
+
+							let arrTab =[];
+							arrTab.push (arrStr6[i6]);
+							arrTab.push (arrStr5[i5]);
+							arrTab.push (arrStr4[i4]);
+							arrTab.push (arrStr3[i3]);
+							arrTab.push (arrStr2[i2]);
+							arrTab.push (arrStr1[i1]);
+							
+							let iMin = GetMin (arrTab); let iMax = GetMax (arrTab); 
+							
+							if (isFinite (iMin) && isFinite (iMax)){
+								if ((iMax - iMin) < 5){
+									if (AllMandatoryNotesInTab (arrTab, arrMandatoryNotes)){ 
+										//console.log (arrTab);
+										arrOUT.push (arrTab); 
+									}
+								}
+							}
+						}//1						
+					}//2					
+				}//3
+			}//4				
+		}//5		
+	}//6
+	
+	return (arrOUT); 
+}
+function AllMandatoryNotesInTab (arrTab, arrMandatoryNotes){
+	//INPUT : 
+	//	arrTab: array of <string>. e.g.: ["x",1,0,3,"x",4]
+	// 	arrMandatoryNotes: array of <string>. Mandatory notes of the chord. 
+	// 	arrTuning: array of <string>. Guitar tuning 
+	//OUTPUT: True or False 
+
+	if (arguments.length !==2) {console.log ("ERROR: Invalid number of arguments"); return;}
+	if (Array.isArray(arrTab)) {}else{console.log ("ERROR: Invalid type");return; }   	
+	if (Array.isArray(arrMandatoryNotes)) {}else{console.log ("ERROR: Invalid type");return; }   	
+	
+	let arrTuning = document.getElementById("selTuning").value.split("-"); 
+		
+	//1.---find the notes for this tab 	
+	let arrTabNotes = []; 
+	let iString = 0; 
+	for (let i=0; i < arrTab.length; i++){
+		if (typeof (arrTab[i]) == "number") {
+			switch (i){
+				case 5: iString=1; break; 
+				case 4: iString=2; break; 
+				case 3: iString=3; break; 
+				case 2: iString=4; break; 
+				case 1: iString=5; break; 
+				case 0: iString=6; break; 
+			}
+			let sNote = GetNoteForFret (iString, arrTab[i], arrTuning); 
+			arrTabNotes.push (sNote);
+		}else{
+			arrTabNotes.push ("x");
+		}
+	}
+	//2.---check if all mandatory notes are in this tab 
+	for (let i=0; i < arrMandatoryNotes.length; i++){
+		if (arrTabNotes.indexOf(arrMandatoryNotes[i]) === -1){return false;}
+	}
+	return true; 
+}
+function GetNoteForFret(iString, iFret, arrTuning) {
+    //INPUT:  a guitar string number (1 to 6), fret number and tuning
+	//OUTPUT: (string) note in that string/fret
+
+	if (arguments.length < 3) {return "ERROR: Invalid number of arguments"}; 
+	if (typeof(iString) !== "number") {return "ERROR: Invalid type"}; 
+	if (typeof(iFret) !== "number") {return "ERROR: Invalid type"}; 
+	if (iString < 0 || iString > 6) {return "ERROR: Invalid arguments"};
+	if (iFret < 0) {return "ERROR: Invalid arguments"};
+		
+	//1.----------------sanitize arrTuning------------------------------------------------
+	for (let i=0; i < arrTuning.length; i++){
+		if (arrTuning[i].indexOf("'") > -1 ){
+			arrTuning[i] = arrTuning[i].replace (/'/g,''); 
+		}
+		if (arrTuning[i].indexOf("b") > -1 ){
+			arrTuning[i] = arrTuning[i].replace (/Ab/g,'G#'); 
+			arrTuning[i] = arrTuning[i].replace (/Bb/g,'A#'); 
+			arrTuning[i] = arrTuning[i].replace (/Cb/g,'B'); 
+			arrTuning[i] = arrTuning[i].replace (/Db/g,'C#'); 
+			arrTuning[i] = arrTuning[i].replace (/Eb/g,'D#'); 
+			arrTuning[i] = arrTuning[i].replace (/Fb/g,'E'); 
+			arrTuning[i] = arrTuning[i].replace (/Gb/g,'F#');
+		}
+	}
+	//2.----------------build the guitar--------------------------------------------------
+	let cuerda1 = GetChromaticScale (arrTuning[5]);  
+	let cuerda2 = GetChromaticScale (arrTuning[4]);
+	let cuerda3 = GetChromaticScale (arrTuning[3]);
+	let cuerda4 = GetChromaticScale (arrTuning[2]);
+	let cuerda5 = GetChromaticScale (arrTuning[1]);
+	let cuerda6 = GetChromaticScale (arrTuning[0]);	
+	//3.--------------find the note in guitar string--------------------------------------
+	switch (iString){
+		case 6: return (cuerda6[iFret]); break; 
+		case 5: return (cuerda5[iFret]); break; 
+		case 4: return (cuerda4[iFret]); break; 
+		case 3: return (cuerda3[iFret]); break; 
+		case 2: return (cuerda2[iFret]); break; 
+		case 1: return (cuerda1[iFret]); break; 
+	}
+	return arrString[iFret];
+}
+
+//---AUXILIARY Functions
+function GetMax (arrIN){
+	//get the max of an array, even if it has NaN
+	//INPUT: array (any type)
+	//OUTPUT: integer
+	if (arguments.length !==1) {console.log ("ERROR: Invalid number of arguments"); return;}
+	if (Array.isArray(arrIN)) {}else{console.log ("ERROR: Invalid type");return; }   		
+	
+	let arrTEMP =[]; 
+
+	//weed out NaNs
+	for (let i=0; i<arrIN.length; i++){
+		if (typeof arrIN[i] === 'number'){arrTEMP.push(arrIN[i]);}
+	}
+	
+	return (Math.max (...arrTEMP)); 
+}
+function GetMin (arrIN){
+	//get the min of an array, even if it has NaN
+	//INPUT: array (any type)
+	//OUTPUT: integer
+	if (arguments.length !==1) {console.log ("ERROR: Invalid number of arguments"); return;}
+	if (Array.isArray(arrIN)) {}else{console.log ("ERROR: Invalid type");return; }   	
+	
+	let arrTEMP =[]; 
+	
+	//weed out NaNs
+	for (let i=0; i<arrIN.length; i++){
+		if (typeof arrIN[i] === 'number'){arrTEMP.push(arrIN[i]);}
+	}
+	return (Math.min (...arrTEMP)); 
+}
+
+function GetChordPatternsOLD(INPUTarrChordNotes, INPUTarrOptionalNotes){
+	var ARRStr1 = ["E","F","F#","G","G#","A","A#","B","C","C#","D","D#","E","F","F#","G","G#","A","A#","B","C","C#","D","D#"];
+	var ARRStr2 = ["B","C","C#","D","D#","E","F","F#","G","G#","A","A#","B","C","C#","D","D#","E","F","F#","G","G#","A","A#"];
+	var ARRStr3 = ["G","G#","A","A#","B","C","C#","D","D#","E","F","F#","G","G#","A","A#","B","C","C#","D","D#","E","F","F#"];
+	var ARRStr4 = ["D","D#","E","F","F#","G","G#","A","A#","B","C","C#","D","D#","E","F","F#","G","G#","A","A#","B","C","C#"];	
+	var ARRStr5 = ["A","A#","B","C","C#","D","D#","E","F","F#","G","G#","A","A#","B","C","C#","D","D#","E","F","F#","G","G#"];
+	var ARRStr6 = ["E","F","F#","G","G#","A","A#","B","C","C#","D","D#","E","F","F#","G","G#","A","A#","B","C","C#","D","D#"];
+
+	var iStr6,iStr5,iStr4,iStr3,iStr2,iStr1;
+	var arrStr6 =[],arrStr5 =[],arrStr4 =[],arrStr3 =[],arrStr2 =[],arrStr1 =[]; //acá guarda el fret NUMBER
+	var OUTarrChordPatterns=[];
+	var arrPattern=[];
+	var i = 0,j = 0,k = 0;  
+	var sNote6, sNote5, sNote4, sNote3, sNote2, sNote1; 
+	var objPattern;
+	
+	//----esto para eliminar la nota duplicada en slash chords:
+	INPUTarrChordNotes= INPUTarrChordNotes.filter(function (el, i, arr) {return arr.indexOf(el) === i;});
+	//----
+
+	//find all chord notes in the strings 
+	arrStr6.push("x");arrStr5.push("x");arrStr4.push("x");arrStr3.push("x");arrStr2.push("x");arrStr1.push("x");
+	INPUTarrChordNotes.forEach (function(chordnote){
+		ARRStr6.forEach (function (stringnote,i){if (chordnote === stringnote) {arrStr6.push(i)};});
+		ARRStr5.forEach (function (stringnote,i){if (chordnote === stringnote) {arrStr5.push(i)};});
+		ARRStr4.forEach (function (stringnote,i){if (chordnote === stringnote) {arrStr4.push(i)};});
+		ARRStr3.forEach (function (stringnote,i){if (chordnote === stringnote) {arrStr3.push(i)};});
+		ARRStr2.forEach (function (stringnote,i){if (chordnote === stringnote) {arrStr2.push(i)};});
+		ARRStr1.forEach (function (stringnote,i){if (chordnote === stringnote) {arrStr1.push(i)};});
+	});
+	
+	//create patterns
+	for (iStr6=0; iStr6<arrStr6.length; iStr6++){
+		sNote6 = (arrStr6[iStr6]==="x")? "x":ARRStr6[arrStr6[iStr6]];
+		if (IsNotInversion (INPUTarrChordNotes, [sNote6])){ //(6) root is root
+			for (iStr5=0; iStr5<arrStr5.length; iStr5++){
+				sNote5 = (arrStr5[iStr5]==="x")? "x":ARRStr5[arrStr5[iStr5]];
+				if (IsNotInversion (INPUTarrChordNotes, [sNote6,sNote5])){//(5) root is root
+					for (iStr4=0; iStr4<arrStr4.length; iStr4++){
+						sNote4 = (arrStr4[iStr4]==="x")? "x":ARRStr4[arrStr4[iStr4]];
+						if (IsNotInversion (INPUTarrChordNotes, [sNote6, sNote5, sNote4])){
+							for (iStr3=0; iStr3<arrStr3.length; iStr3++){
+								sNote3 = (arrStr3[iStr3]==="x")? "x":ARRStr3[arrStr3[iStr3]];
+								for (iStr2=0; iStr2<arrStr2.length; iStr2++){
+									sNote2 = (arrStr2[iStr2]==="x")? "x":ARRStr2[arrStr2[iStr2]];						
+									for (iStr1=0; iStr1<arrStr1.length; iStr1++){
+										sNote1 = (arrStr1[iStr1]==="x")? "x":ARRStr1[arrStr1[iStr1]];
+										
+										var arrFrets =[];
+										arrFrets.push (arrStr6[iStr6]);
+										arrFrets.push (arrStr5[iStr5]);
+										arrFrets.push (arrStr4[iStr4]);
+										arrFrets.push (arrStr3[iStr3]);
+										arrFrets.push (arrStr2[iStr2]);
+										arrFrets.push (arrStr1[iStr1]);
+
+										objPattern = {
+										tab6: arrStr6[iStr6], note6: sNote6,
+										tab5: arrStr5[iStr5], note5: sNote5,
+										tab4: arrStr4[iStr4], note4: sNote4,
+										tab3: arrStr3[iStr3], note3: sNote3,
+										tab2: arrStr2[iStr2], note2: sNote2,
+										tab1: arrStr1[iStr1], note1: sNote1,
+										barre1:"", barre1len:"", 
+										barre2:"", barre2len: "",
+										minFret: GetMin(arrFrets),
+										maxFret: GetMax(arrFrets), 
+										mutes: 0,
+										};
+										objPattern.frets = objPattern.maxFret - objPattern.minFret;
+										
+										if (objPattern.frets<5){	
+											if (AllNotesInChord(INPUTarrChordNotes, INPUTarrOptionalNotes, objPattern)){
+												if (TabIsPlayable(objPattern)){
+													if (RootIsRoot (INPUTarrChordNotes, objPattern)){
+														objPattern.minFret = GetMin(arrFrets); 
+														objPattern.maxFret = GetMax(arrFrets); 
+														objPattern.frets = objPattern.maxFret - objPattern.minFret;	
+														objPattern.mutes = countTabMutes ([objPattern.tab6,objPattern.tab5,objPattern.tab4,objPattern.tab3,objPattern.tab2,objPattern.tab1]); 
+														if (RootIsNotDup (objPattern)){
+															FixBarre (objPattern); 
+															OUTarrChordPatterns.push (objPattern);
+														}
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						} // (4)
+					}
+				} //(5)
+			}
+		} //(6)
+	}
+	return (OUTarrChordPatterns); 
+ }
