@@ -10,11 +10,21 @@ document.getElementById("selTuning").addEventListener("change", DrawTabs, false)
 
 //2. Create the chords -----------------
 let chordsDB = BuildChordDB(); 
+chordsDB.sort(function(a,b){
+	let sortOrder5 = ["5", "b5"];
+	if (a.FormulaInt.length < b.FormulaInt.length) {return -1} 
+	if (a.FormulaInt.length > b.FormulaInt.length) {return 1;}
+	if (a.FormulaInt.length == b.FormulaInt.length) {
+		return sortOrder5.indexOf(a.FormulaStr[2]) - sortOrder5.indexOf(b.FormulaStr[2]);
+	}
+	});
+							   
 AddDiadsToDB(chordsDB); 
 
 console.log (chordsDB[0]);
 let iRandom = (Math.floor(Math.random() * chordsDB.length));
 console.log (chordsDB[iRandom]);
+ 
 
 //3. Add to Select box
 let optGroupDiad = document.getElementById("OptGroupDiad");
@@ -60,7 +70,6 @@ function ChordFinderMain(){
 	let arrOptionalStr = GetOptionalNotes (iSeven); 
 	let arrOptionalInt = GetChordDegrees (arrOptionalStr);
 	
-	
 	console.clear(); 
 	console.log ("%c-----------------------------------------------------------------------------------------------------------------------------------", 'color: cyan'); 
 	console.log ("%cRoot			   	:", "color: cyan", strRoot); 
@@ -93,14 +102,20 @@ function ChordFinderMain(){
 	//3. Get the tabs 
 	let arrTuning = document.getElementById("selTuning").value.split("-"); 
 	let arrTabs = GetTabs (arrNotes, arrOptionalNotes, arrTuning); 
+
 	console.log ("%cTabs for this chord 		:", "color: cyan", arrTabs.length); 	
-	
-	for (let i=0; i<arrTabs.length; i++){
-		console.log (arrTabs[i]); 
-	}
-	
-	
-	
+		
+	arrTabs.sort(function(a,b){
+		let xa = 0; let xb=0; 
+		for (let i=0; i< a.length; i++){if (a[i]==="x") {xa++;}}
+		for (let i=0; i< b.length; i++){if (b[i]==="x") {xb++;}}		
+		if (xa < xb) {return -1} 
+		if (xa > xb) {return 1;}
+		if (xa === xb) {return 0;}; 
+	});	
+
+	for (let i=0; i<arrTabs.length; i++){console.log (arrTabs[i]);}
+
 	//4. Output text 
 	
 	//5. Output guitar 
@@ -669,10 +684,7 @@ function GetTabs(arrNotes, arrOptionalNotes, arrTuning){
 	console.log ("%c-----------------------------------------------------------------------------------------------------------------------------------", 'color: cyan'); 
 	console.log ("%cMandatory Notes		   	:", "color: cyan", arrMandatoryNotes); 	
 	
-	//2.-------------reference, we build the string from here 
-    let arrString = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"];
-	
-	//3.----------------sanitize arrTuning------------------------------------------------
+	//2.----------------sanitize arrTuning------------------------------------------------
 	for (let i=0; i < arrTuning.length; i++){
 		if (arrTuning[i].indexOf("'") > -1 ){
 			arrTuning[i] = arrTuning[i].replace (/'/g,''); 
@@ -687,14 +699,14 @@ function GetTabs(arrNotes, arrOptionalNotes, arrTuning){
 			arrTuning[i] = arrTuning[i].replace (/Gb/g,'F#');
 		}
 	}
-	//4.----------------build the guitar------------------------------------------------
+	//3.----------------build the guitar------------------------------------------------
 	let cuerda1 = GetChromaticScale (arrTuning[5]);  
 	let cuerda2 = GetChromaticScale (arrTuning[4]);
 	let cuerda3 = GetChromaticScale (arrTuning[3]);
 	let cuerda4 = GetChromaticScale (arrTuning[2]);
 	let cuerda5 = GetChromaticScale (arrTuning[1]);
 	let cuerda6 = GetChromaticScale (arrTuning[0]);
-	//5.---------------find all chord notes in the strings------------------------------
+	//4.---------------find all chord notes in the strings------------------------------
 	let arrStr6=[];let arrStr5=[]; let arrStr4=[]; let arrStr3=[]; let arrStr2=[]; let arrStr1=[];  
 	arrStr6.push("x");arrStr5.push("x");arrStr4.push("x");arrStr3.push("x");arrStr2.push("x");arrStr1.push("x");
 	arrNotes.forEach (function(chordnote){
@@ -705,7 +717,7 @@ function GetTabs(arrNotes, arrOptionalNotes, arrTuning){
 		cuerda2.forEach (function (cuerdaNote,i){if (chordnote === cuerdaNote) {arrStr2.push(i)};});
 		cuerda1.forEach (function (cuerdaNote,i){if (chordnote === cuerdaNote) {arrStr1.push(i)};});
 	});	
-	//6.--------------create patterns--------------------------------------------------
+	//5.--------------create patterns--------------------------------------------------
 	for (let i6=0; i6 < arrStr6.length; i6++){
 		for (let i5=0; i5 < arrStr5.length; i5++){
 			for (let i4=0; i4 < arrStr4.length; i4++){
@@ -726,8 +738,14 @@ function GetTabs(arrNotes, arrOptionalNotes, arrTuning){
 							if (isFinite (iMin) && isFinite (iMax)){
 								if ((iMax - iMin) < 5){
 									if (AllMandatoryNotesInTab (arrTab, arrMandatoryNotes)){ 
-										//console.log (arrTab);
-										arrOUT.push (arrTab); 
+										if (RootIsRoot (arrTab, arrMandatoryNotes[0])){
+											if (RootIsNotDup (arrTab)){
+												if (TabIsPlayable (arrTab)){
+													//console.log (arrTab);
+													arrOUT.push (arrTab); 
+												}
+											}
+										}
 									}
 								}
 							}
@@ -821,7 +839,178 @@ function GetNoteForFret(iString, iFret, arrTuning) {
 	}
 	return arrString[iFret];
 }
+function RootIsRoot (arrTab, strNote){
+	//INPUT:
+	//arrTab: <array>. E.g.: [ "x", 1, 1, 2, 5, 3 ]
+	//strNote: <string> representing the root note of the chord E.g.: "C#"
+	//OUTPUT: 
+	//true: lowest note of the tab = root note of the chord
+	//false: lowest note of the tab != root note of the chord
+	
+	if (arguments.length !==2) {console.log ("ERROR: Invalid number of arguments"); return false;}
+	if (Array.isArray(arrTab)) {}else{console.log ("ERROR: Invalid type");return false; }   	
+	
+	let arrTuning = document.getElementById("selTuning").value.split("-"); 
+		
+	//1.---find the notes for this tab 	
+	let arrTabNotes = []; 
+	let iString = 0; 
+	for (let i=0; i < arrTab.length; i++){
+		if (typeof (arrTab[i]) == "number") {
+			switch (i){
+				case 5: iString=1; break; 
+				case 4: iString=2; break; 
+				case 3: iString=3; break; 
+				case 2: iString=4; break; 
+				case 1: iString=5; break; 
+				case 0: iString=6; break; 
+			}
+			let sNote = GetNoteForFret (iString, arrTab[i], arrTuning); 
+			arrTabNotes.push (sNote);
+		}else{
+			arrTabNotes.push ("x");
+		}
+	}	
+	
+	//2.---check if root is root 
+	if (arrTabNotes[0]!== "x"){
+		if  (arrTabNotes[0]!== strNote) {return false;}
+	}
+	if (arrTabNotes[0]=== "x" && arrTabNotes[1]!== "x"){
+		if  (arrTabNotes[1]!== strNote) {return false;}
+	}
+	if (arrTabNotes[0]=== "x" && arrTabNotes[1]=== "x" && arrTabNotes[2]!== "x"){
+		if  (arrTabNotes[2]!== strNote) {return false;}
+	}
+	if (arrTabNotes[0]=== "x" && arrTabNotes[1]=== "x" && arrTabNotes[2]=== "x"){
+		if  (arrTabNotes[3]!== strNote) {return false;}
+	}
 
+	return true; 
+}
+function RootIsNotDup (arrTab){
+	//INPUT: <array>. E.g.: [ "x", 1, 1, 2, 5, 3 ]
+	//OUTPUT: true or false
+	
+	if (arguments.length !==1) {console.log ("ERROR: Invalid number of arguments"); return false;}
+	if (Array.isArray(arrTab)) {}else{console.log ("ERROR: Invalid type");return false; }   		
+
+	if (arrTab[0]!== "x"){
+		if  (arrTab[0] > 11)  return false;
+	}
+
+	if (arrTab[0]=== "x" && arrTab[1] !== "x"){
+		if  (arrTab[1] > 11)  return false;
+	}
+	
+	if (arrTab[0]=== "x" && arrTab[1] === "x" && arrTab[2] !== "x"){
+		if  (arrTab[2] > 11)  return false;
+	}
+
+	if (arrTab[0]=== "x" && arrTab[1] === "x" && arrTab[2] === "x"){
+		if  (arrTab[3] > 11)  return false;
+	}
+
+	return true; 
+}
+function TabIsPlayable (arrTab){
+	let s6 = arrTab[0]; 
+	let s5 = arrTab[1]; 
+	let s4 = arrTab[2]; 
+	let s3 = arrTab[3];
+	let s2 = arrTab[4]; 
+	let s1 = arrTab[5];
+	let aTEMP = []; 
+	let aMIN=0, fingers=0, iBarre=0; 
+	
+	//cuerdas no consecutivas
+	let mutes = 0; 
+	if (s6 === "x") {mutes+=1;}	if (s5 === "x") {mutes+=1;};if (s4 === "x") {mutes+=1;};if (s3 === "x") {mutes+=1;};if (s2 === "x") {mutes+=1;};if (s1 === "x") {mutes+=1;};		
+	//if (mutes === 4) {return false;}
+	if (mutes === 3) {
+		if (s6 !== "x" && s5 !== "x" && s4 === "x"){return false;}
+		if (s6 === "x" && s5 !== "x" && s4 !== "x" && s3 === "x"){return false;}	
+		if (s6 === "x" && s5 === "x" && s4 !== "x" && s3 !== "x" && s2 === "x"){return false;}	
+		if (s6 === "x" && s5 === "x" && s4 !== "x" && s3 === "x"){return false;}
+		if (s6 === "x" && s4 === "x" && s3 === "x"){return false;}	
+		if (s6 === "x" && s4 === "x" && s2 === "x"){return false;}	
+		if (s6 === "x" && s4 === "x" && s1 === "x"){return false;}	
+		if (s5 === "x" && s4 === "x" && s1 === "x"){return false;}
+		if (s5 === "x" && s4 === "x" && s2 === "x"){return false;}
+		if (s5 === "x" && s3 === "x" && s1 === "x"){return false;}	
+		if (s5 === "x" && s3 === "x" && s2 === "x"){return false;}
+		if (s5 === "x" && s2 === "x" && s1 === "x"){return false;}	
+		if (s5 === "x" && s4 === "x" && s3 === "x"){return false;}
+	}
+	//kill them all to the right (from the minimum fret) if it has JUST ONE "x" and more than 3 fingers to the right
+	if (s6 !== "x") {aTEMP.push(s6)};
+	if (s5 !== "x") {aTEMP.push(s5)};
+	if (s4 !== "x") {aTEMP.push(s4)};
+	if (s3 !== "x") {aTEMP.push(s3)};
+	if (s2 !== "x") {aTEMP.push(s2)};
+	if (s1 !== "x") {aTEMP.push(s1)};
+
+	if (aTEMP.length >= 5){
+		aMIN = Math.min(...aTEMP);
+		fingers = 0;
+		iBarre = 0; 
+		if (s1 > aMIN){
+			if (s1 === s2){
+				if (s2 === s3){
+					if (s3 === s4){
+						if (s4 === s5){
+							iBarre = 5;
+						}else{
+							iBarre = 4;
+						}
+					}else{
+						iBarre = 3; 
+					}
+				}else{
+					iBarre = 2; 
+				}
+			}else{
+				iBarre = 0; 
+			}
+		}
+		if (iBarre === 0){
+			if (s1 > aMIN) {fingers++;}
+			if (s2 > aMIN) {fingers++;}
+			if (s3 > aMIN) {fingers++;}
+			if (s4 > aMIN) {fingers++;}
+			if (s5 > aMIN) {fingers++;}
+			if (s6 > aMIN) {fingers++;}
+			if (fingers > 3){return false;}			
+		}
+		if (iBarre === 2){
+			if (s1 > aMIN) {fingers++;}
+			if (s3 > aMIN) {fingers++;}
+			if (s4 > aMIN) {fingers++;}
+			if (s5 > aMIN) {fingers++;}
+			if (s6 > aMIN) {fingers++;}	
+			if (fingers > 3){return false;}			
+		}
+		if (iBarre === 3){
+			if (s3 > aMIN) {fingers++;}
+			if (s4 > aMIN) {fingers++;}
+			if (s5 > aMIN) {fingers++;}
+			if (s6 > aMIN) {fingers++;}	
+			if (fingers > 3){return false;}			
+		}	
+		if (iBarre === 4){
+			if (s4 > aMIN) {fingers++;}
+			if (s5 > aMIN) {fingers++;}
+			if (s6 > aMIN) {fingers++;}	
+			if (fingers > 3){return false;}
+		}
+		if (iBarre === 5){
+			if (s5 > aMIN) {fingers++;}
+			if (s6 > aMIN) {fingers++;}	
+			if (fingers > 3){return false;}			
+		}
+	}
+	return true;
+}
 //---AUXILIARY Functions
 function GetMax (arrIN){
 	//get the max of an array, even if it has NaN
