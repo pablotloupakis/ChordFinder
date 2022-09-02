@@ -57,7 +57,7 @@ function ChordFinderMain(){
 	let elRoot = document.getElementById("selRootNote"); 
 	let elChord = document.getElementById("selChordList"); 
 	let elBass = document.getElementById("selBassNote"); 
-	
+	let arrTuning = document.getElementById("selTuning").value.split("-"); 	
 	if  ((elRoot.selectedIndex === 0) || (elChord.selectedIndex === 0)) {return; }
 	
 	let strRoot = elRoot.options[elRoot.selectedIndex].value; 
@@ -70,6 +70,49 @@ function ChordFinderMain(){
 	let arrOptionalStr = GetOptionalNotes (iSeven); 
 	let arrOptionalInt = GetChordDegrees (arrOptionalStr);
 	
+	//2. Apply Notes to the Formula 
+	let arrScale = GetChromaticScale(strRoot); 
+	console.log ("%cCromatic Scale			:", "color: cyan", arrScale); 
+	
+	let arrNotes = []; 
+	let arrOptionalNotes = []; 
+
+	for (let i=0; i < arrFormulaInt.length; i++){arrNotes.push (arrScale[arrFormulaInt[i]]);}
+	for (let i=0; i < arrOptionalInt.length; i++){arrOptionalNotes.push (arrScale[arrOptionalInt[i]]);}
+	let arrMandatoryNotes = GetMandatoryNotes (arrNotes, arrOptionalNotes); 
+
+	
+	//3. Deal with the bass note 
+	if  ((elBass.selectedIndex !== 0) && (strRoot !== strBass)) { //means the bass note is other than the default
+		strChordName = strChordName + " / " + strBass;
+		if (arrNotes.indexOf(strBass) === -1){
+			console.log ("%cNOT AN INVERSION		:", "color: orange", strBass); 	
+			//it's NOT an inversion, need to add strBass to the first position in the array of notes 
+			arrNotes.unshift (strBass); 
+			arrMandatoryNotes.unshift (strBass); 
+		}else{
+			console.log ("%cIT IS AN INVERSION		:", "color: orange", strBass); 	
+			//it's an inversion, need to move strBass to the first position in the array of notes 
+			let index =0; 
+			index = arrNotes.indexOf(strBass); 
+			arrNotes.unshift(arrNotes.splice(index, 1)[0]);
+			index = arrMandatoryNotes.indexOf(strBass); 
+			arrMandatoryNotes.unshift(arrMandatoryNotes.splice(index, 1)[0]);
+		}
+	}
+	
+	//4. Get the tabs 
+	let arrTabs = GetTabs (arrNotes, arrOptionalNotes, arrMandatoryNotes, arrTuning); 
+
+	arrTabs.sort(function(a,b){
+		let xa = 0; let xb=0; 
+		for (let i=0; i< a.length; i++){if (a[i]==="x") {xa++;}}
+		for (let i=0; i< b.length; i++){if (b[i]==="x") {xb++;}}		
+		if (xa < xb) {return -1} 
+		if (xa > xb) {return 1;}
+		if (xa === xb) {return 0;}; 
+	});		
+
 	console.clear(); 
 	console.log ("%c-----------------------------------------------------------------------------------------------------------------------------------", 'color: cyan'); 
 	console.log ("%cRoot			   	:", "color: cyan", strRoot); 
@@ -81,44 +124,16 @@ function ChordFinderMain(){
 	console.log ("%cOptional notes (degrees)	:", "color: cyan", arrOptionalStr);
 	console.log ("%cOptional notes (integer)	:", "color: cyan", arrOptionalInt);
 	console.log ("%cSeven				:", "color: cyan", iSeven); 	
-
-	//2. Apply Notes to the Formula 
-	let arrScale = GetChromaticScale(strRoot); 
-	console.log ("%cCromatic Scale			:", "color: cyan", arrScale); 
-	
-	let arrNotes = []; 
-	let arrOptionalNotes = []; 
-
-	for (let i=0; i < arrFormulaInt.length; i++){
-		arrNotes.push (arrScale[arrFormulaInt[i]]); 
-	}
-	for (let i=0; i < arrOptionalInt.length; i++){
-		arrOptionalNotes.push (arrScale[arrOptionalInt[i]]); 
-	}
-	
 	console.log ("%cChord Notes			:", "color: cyan", arrNotes); 	
-	console.log ("%cChord Optional Notes 		:", "color: cyan", arrOptionalNotes); 	
-	
-	//3. Get the tabs 
-	let arrTuning = document.getElementById("selTuning").value.split("-"); 
-	let arrTabs = GetTabs (arrNotes, arrOptionalNotes, arrTuning); 
-
+	console.log ("%cChord Optional Notes 		:", "color: cyan", arrOptionalNotes); 
+	console.log ("%cChord Mandatory Notes 		:", "color: cyan", arrMandatoryNotes); 		
 	console.log ("%cTabs for this chord 		:", "color: cyan", arrTabs.length); 	
 		
-	arrTabs.sort(function(a,b){
-		let xa = 0; let xb=0; 
-		for (let i=0; i< a.length; i++){if (a[i]==="x") {xa++;}}
-		for (let i=0; i< b.length; i++){if (b[i]==="x") {xb++;}}		
-		if (xa < xb) {return -1} 
-		if (xa > xb) {return 1;}
-		if (xa === xb) {return 0;}; 
-	});	
-
 	for (let i=0; i<arrTabs.length; i++){console.log (arrTabs[i]);}
 
-	//4. Output text 
+	//5. Output text 
 	
-	//5. Output guitar 
+	//6. Output guitar 
 
 }
 
@@ -659,32 +674,43 @@ function GetOptionalNotes (iSeven) {
 	return (arrOut);  
 
 }
-function GetTabs(arrNotes, arrOptionalNotes, arrTuning){
+function GetMandatoryNotes (arrNotes, arrOptionalNotes) {  
+	//read rules in GetOptionalNotes function for an explanation 
+	//INPUT: 
+	//arrNotes: array of <string>. 						E.g.: ["C","E","G","D"]
+	//arrOptionalNotes: array of <string>. 				E.g.: ["G"]
+	//OUTPUT: array of <strings> with optional notes	E.g.: ["C","E","D"]
+
+	if (arguments.length !==2) {console.log ("ERROR: Invalid number of arguments"); return(arrOut);}
+	if (Array.isArray(arrNotes)) {}else{console.log ("ERROR: Invalid type");return(arrOut);}	
+	if (Array.isArray(arrOptionalNotes)) {}else{console.log ("ERROR: Invalid type");return(arrOut);}	
+
+	let arrOut=[]; 
+	for (let i=0; i<arrNotes.length; i++){
+		if (arrOptionalNotes.indexOf(arrNotes[i]) === -1) {
+			arrOut.push (arrNotes[i]); 	
+		}
+	}
+	return (arrOut);  
+}
+function GetTabs(arrNotes, arrOptionalNotes, arrMandatoryNotes, arrTuning){
 	//INPUT : 
 	//	arrNotes: array of <string>. Notes of the chord 
 	// 	arrOptionalNotes: array of <string>. Optional notes of the chord 
+	//	arrMandatoryNotess: array of <string>. Mandatory notes of the chord 
 	// 	arrTuning: array of <string>. Guitar tuning 
 	//OUTPUT:  array of arrays. Each array being a tab. 
 
-	if (arguments.length !==3) {console.log ("ERROR: Invalid number of arguments"); return;}
-	if (Array.isArray(arrNotes)) {}else{console.log ("ERROR: Invalid type");return; }   	
-	if (Array.isArray(arrOptionalNotes)) {}else{console.log ("ERROR: Invalid type");return; }   	
-	if (Array.isArray(arrTuning)) {}else{console.log ("ERROR: Invalid type");return; }   	
-	
 	let arrOUT = []; 
 	
-	//1.-------------find the MANDATORY notes
-	let arrMandatoryNotes=[]; 
-	for (let i=0; i<arrNotes.length; i++){
-		if (arrOptionalNotes.indexOf(arrNotes[i]) === -1) {
-			arrMandatoryNotes.push (arrNotes[i]); 	
-		}
-	}
+	if (arguments.length !==4) {console.log ("ERROR: Invalid number of arguments"); return (arrOUT);}
+	if (Array.isArray(arrNotes)) {}else{console.log ("ERROR: Invalid type");return (arrOUT); }   	
+	if (Array.isArray(arrOptionalNotes)) {}else{console.log ("ERROR: Invalid type");return (arrOUT); }  
+	if (Array.isArray(arrMandatoryNotes)) {}else{console.log ("ERROR: Invalid type");return (arrOUT); }   	
+	if (Array.isArray(arrTuning)) {}else{console.log ("ERROR: Invalid type");return (arrOUT); }   	
+		
 	
-	console.log ("%c-----------------------------------------------------------------------------------------------------------------------------------", 'color: cyan'); 
-	console.log ("%cMandatory Notes		   	:", "color: cyan", arrMandatoryNotes); 	
-	
-	//2.----------------sanitize arrTuning------------------------------------------------
+	//1.----------------sanitize arrTuning------------------------------------------------
 	for (let i=0; i < arrTuning.length; i++){
 		if (arrTuning[i].indexOf("'") > -1 ){
 			arrTuning[i] = arrTuning[i].replace (/'/g,''); 
@@ -699,14 +725,14 @@ function GetTabs(arrNotes, arrOptionalNotes, arrTuning){
 			arrTuning[i] = arrTuning[i].replace (/Gb/g,'F#');
 		}
 	}
-	//3.----------------build the guitar------------------------------------------------
+	//2.----------------build the guitar------------------------------------------------
 	let cuerda1 = GetChromaticScale (arrTuning[5]);  
 	let cuerda2 = GetChromaticScale (arrTuning[4]);
 	let cuerda3 = GetChromaticScale (arrTuning[3]);
 	let cuerda4 = GetChromaticScale (arrTuning[2]);
 	let cuerda5 = GetChromaticScale (arrTuning[1]);
 	let cuerda6 = GetChromaticScale (arrTuning[0]);
-	//4.---------------find all chord notes in the strings------------------------------
+	//3.---------------find all chord notes in the strings------------------------------
 	let arrStr6=[];let arrStr5=[]; let arrStr4=[]; let arrStr3=[]; let arrStr2=[]; let arrStr1=[];  
 	arrStr6.push("x");arrStr5.push("x");arrStr4.push("x");arrStr3.push("x");arrStr2.push("x");arrStr1.push("x");
 	arrNotes.forEach (function(chordnote){
@@ -717,7 +743,7 @@ function GetTabs(arrNotes, arrOptionalNotes, arrTuning){
 		cuerda2.forEach (function (cuerdaNote,i){if (chordnote === cuerdaNote) {arrStr2.push(i)};});
 		cuerda1.forEach (function (cuerdaNote,i){if (chordnote === cuerdaNote) {arrStr1.push(i)};});
 	});	
-	//5.--------------create patterns--------------------------------------------------
+	//4.--------------create patterns--------------------------------------------------
 	for (let i6=0; i6 < arrStr6.length; i6++){
 		for (let i5=0; i5 < arrStr5.length; i5++){
 			for (let i4=0; i4 < arrStr4.length; i4++){
