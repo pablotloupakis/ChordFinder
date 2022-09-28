@@ -113,6 +113,7 @@ function ChordFinderMain(){
 		if (xa === xb) {return 0;}; 
 	});		
 
+	//5. Output console
 	console.clear(); 
 	console.log ("%c-----------------------------------------------------------------------------------------------------------------------------------", 'color: cyan'); 
 	console.log ("%cRoot			   	:", "color: cyan", strRoot); 
@@ -128,12 +129,11 @@ function ChordFinderMain(){
 	console.log ("%cChord Optional Notes 		:", "color: cyan", arrOptionalNotes); 
 	console.log ("%cChord Mandatory Notes 		:", "color: cyan", arrMandatoryNotes); 		
 	console.log ("%cTabs for this chord 		:", "color: cyan", arrTabs.length); 	
-		
 	for (let i=0; i<arrTabs.length; i++){console.log (arrTabs[i]);}
 
-	//5. Output text 
+	//6. Output text 
 	
-	//6. Output guitar 
+	//7. Output guitar 
 
 }
 
